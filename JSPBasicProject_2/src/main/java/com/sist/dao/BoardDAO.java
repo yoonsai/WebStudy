@@ -115,4 +115,240 @@ public class BoardDAO {
 			disConnection();
 		}
 	}
+	// 상세보기 => 기능처리 (모든 메소드에 SQL문장 1개가 아니다)
+	   public BoardVO boardDetailData(int no)
+	   {
+	      BoardVO vo=new BoardVO();
+	      try
+	      {
+	         getConnection();
+	         //Spring
+	         String sql="UPDATE replyBoard SET "
+	                 +"hit=hit+1 "
+	                 +"WHERE no="+no;
+	         
+	         ps=conn.prepareStatement(sql);
+	         ps.executeUpdate();
+	         // 조회수 증가
+	         sql="SELECT no,name,subject,content,To_CHAR(regdate,'YYYY-MM-DD HH24:MI:SS'),hit "
+	           +"FROM replyBoard "
+	           +"WHERE no="+no;
+	         ps=conn.prepareStatement(sql);
+	         ResultSet rs=ps.executeQuery();
+	         rs.next();
+	         vo.setNo(rs.getInt(1));
+	         vo.setName(rs.getString(2));
+	         vo.setSubject(rs.getString(3));
+	         vo.setContent(rs.getString(4));
+	         vo.setDbday(rs.getString(5));
+	         vo.setHit(rs.getInt(6));
+	         rs.close();
+	      }catch(Exception ex)
+	      {
+	         ex.printStackTrace();
+	      }
+	      finally
+	      {
+	         disConnection();   
+	      }
+	      return vo;
+	   }
+	   //수정 데이터 읽기
+	   public BoardVO boardUpdateData(int no)
+	   {
+	      BoardVO vo=new BoardVO();
+	      try
+	      {
+	         getConnection();
+	         //Spring
+	         String sql="SELECT no,name,subject,content "
+	           +"FROM replyBoard "
+	           +"WHERE no="+no;
+	         ps=conn.prepareStatement(sql);
+	         ResultSet rs=ps.executeQuery();
+	         rs.next();
+	         vo.setNo(rs.getInt(1));
+	         vo.setName(rs.getString(2));
+	         vo.setSubject(rs.getString(3));
+	         vo.setContent(rs.getString(4));
+	         rs.close();
+	      }catch(Exception ex)
+	      {
+	         ex.printStackTrace();
+	      }
+	      finally
+	      {
+	         disConnection();   
+	      }
+	      return vo;
+	   }
+	   //실제 수정
+	   public boolean boardUpdate(BoardVO vo)
+	   {
+		   boolean bCheck=false;   
+		   try
+		      {
+		         getConnection();
+		         String sql="SELECT pwd FROM replyBoard "
+		         		+ "WHERE no="+vo.getNo();
+		         ps=conn.prepareStatement(sql);
+		         ResultSet rs=ps.executeQuery();
+		         rs.next();
+		         String db_pwd=rs.getString(1);
+		         rs.close();
+		         if(db_pwd.equals(vo.getPwd()))
+		         {
+		        	 bCheck=true;  
+		        	 sql="UPDATE replyBoard SET name=?,subject=?,content=? "
+				         		+ "WHERE no=?";
+				         ps=conn.prepareStatement(sql);
+				         ps.setString(1, vo.getName());
+				         ps.setString(2, vo.getSubject());
+				         ps.setString(3, vo.getContent());
+				         ps.setInt(4, vo.getNo());
+				         ps.executeUpdate();
+		         }
+		         
+		      }catch(Exception ex)
+		      {
+		         ex.printStackTrace();
+		      }
+		      finally
+		      {
+		         disConnection();   
+		      }
+		   return bCheck;
+	   }
+	   //답변
+	   public void boardReplyInsert(int pno,BoardVO vo)
+	   {
+		   //1. pno => group_id,step,tab
+		   
+		   //2. => 답변의 핵심 
+		   /*       
+		    *                    gi   gs  gt
+		    *     AAAAAA          1    0   0
+		    *       =>PPPPP       1    1   1
+		    *       =>KKKKK       1    2   1  ASC
+		    *       =>BBBBB       1    3   1
+		    *        =>CCCCCC     1    4   2
+		    *       
+		    *     DDDDDD          2    0   0
+		    */
+		   //3. insert 
+		   //4. depth 증가
+		   try
+		   {
+			   getConnection();
+			   //1. gi,gs,gt
+			   String sql="SELECT group_id,group_step,group_tab "
+					     +"FROM replyBoard "
+					     +"WHERE no="+pno;
+			   ps=conn.prepareStatement(sql);
+			   ResultSet rs=ps.executeQuery();
+			   rs.next();
+			   int group_id=rs.getInt(1);
+			   int group_step=rs.getInt(2);
+			   int group_tab=rs.getInt(3);
+			   rs.close();
+			   
+			   // 위치 조정 
+			   sql="UPDATE replyBoard SET "
+				  +"group_step=group_step+1 "
+				  +"WHERE group_id=? AND group_step>?";
+			   ps=conn.prepareStatement(sql);
+			   ps.setInt(1, group_id);
+			   ps.setInt(2, group_step);
+			   ps.executeUpdate();
+			   
+			   //실제 답변 저장 
+			   sql="INSERT INTO replyBoard(no,name,subject,content,pwd,"
+				  +"group_id,group_step,group_tab,root) "
+				  +"VALUES(rb_no_seql.nextval,?,?,?,?,?,?,?,?)";
+			   ps=conn.prepareStatement(sql);
+			   ps.setString(1, vo.getName());
+			   ps.setString(2, vo.getSubject());
+			   ps.setString(3, vo.getContent());
+			   ps.setString(4, vo.getPwd());
+			   ps.setInt(5,group_id);
+			   ps.setInt(6, group_step+1);
+			   ps.setInt(7, group_tab+1);
+			   ps.setInt(8, pno);
+			   ps.executeUpdate();
+			   //depth증가 
+			   sql="UPDATE replyBoard SET "
+				  +"depth=depth+1 "
+				  +"WHERE no="+pno;
+			   ps=conn.prepareStatement(sql);
+			   ps.executeUpdate();
+			   
+					   
+		   }catch(Exception ex)
+		   {
+			   ex.printStackTrace();
+		   }
+		   finally
+		   {
+			   disConnection();
+		   }
+	   }
+	   public boolean boardDelete(int no,String pwd) {
+		   boolean bCheck=false;
+		   try {
+			   getConnection();
+			   String sql="SELECT pwd,root,depth "
+			   		+ "FROM replyBoard "
+			   		+ "WHERE no="+no;
+			   ps=conn.prepareStatement(sql);
+			   ResultSet rs=ps.executeQuery();
+			   rs.next();
+			   String db_pwd=rs.getString(1);
+			   int root=rs.getInt(2);
+			   int depth=rs.getInt(3);
+			   rs.close();
+			   if(db_pwd.equals(pwd)) // 삭제조건
+			   {
+				   bCheck=true;
+				   if(depth==0) // 답변이 없는 경우
+				   {
+					   sql="DELETE FROM replyBoard "
+					   		+ "WHERE no="+no;
+					   ps=conn.prepareStatement(sql);
+					   ps.executeUpdate();
+				   }
+				   else { // 답변이 있는 경우
+					   String msg="관리자가 삭제한 게시물입니다";
+					   sql="UPDATE replyBoard SET "
+					   		+ "subject=?,content=? "
+					   		+ "WHERE no="+no;
+					   ps=conn.prepareStatement(sql);
+					   ps.setString(1, msg);
+					   ps.setString(2, msg);
+					   ps.setInt(3, no);
+					   ps.executeUpdate();
+				   }
+				   sql="UPDATE replyBoard SET "
+				   		+ "depth=depth-1 "
+				   		+ "WHERE no="+root;
+				   ps=conn.prepareStatement(sql);
+				   ps.executeUpdate();
+			   }
+			   //1. 비밀번호 검색
+			   /*
+			    *  2. 비밀번호(o)
+			    *     2-1. root,depth
+			    *          => depth==0 => delete
+			    *             depth!=0 => update
+			    *     2-2. depth를 감소 => root
+			    *     비밀번호(x) => 종료
+			    * 
+			    * */
+		   }catch(Exception e)
+		   {
+			   e.printStackTrace();
+		   }finally {
+			   disConnection();
+		   }
+		   return bCheck;
+	   }
 }

@@ -81,7 +81,34 @@
              <%
                 }
              %>
-               <a href="detail.jsp?no=<%=vo.getNo()%>"><%=vo.getSubject() %></a>&nbsp;
+               <a href="detail.jsp?no=<%=vo.getNo()%>&page=<%=curpage%>"><%=vo.getSubject() %></a>&nbsp;
+               <%-- 데이터는 항상 앞에 있는 파일이 받는다
+                    no에 해당하는 게시물을 출력 요청
+                    => 사용자 요청 
+                       1) <form> : 추가,수정,답변,회원가입,회원수정 ==> post방식
+                       2) 화면변경 : <a> ==> get방식
+                          get방식은 데이터를 받음 
+                          데이터를 받는 파일명?키=값&키2=값...
+                                            === 구분자
+                          => GET : URL주소에 노출 : id,pwd..(session)
+                    => 클라이언트 / 서버
+                       요청       처리 후 응답 => 웹 프로그램 (네트워크 : C/S)
+                       == 요청에 관련된 데이터를 묶어서 한번에 전송
+                          웹서버에서 묶어준다 : request
+                          request => 클라이언트 관련 데이터 관리
+                                     ===============
+                                     1) Cookie => request.getCookies()
+                                     2) Session => request.getSession()
+                          response => HTML을 전송해서 브라우저 출력
+                                      Cookie를 전송
+                                      원하는 페이지 이동 : redirect
+                     1. 상세보기 : 한개만 보여준다 => primary key
+                     2. 추가,수정 => 데이터베이스
+                     3. 예약 => 예약과 관련된 테이블에 컬럼
+                               ===================
+                     동작방식
+                                              
+                --%>
             <%
                SimpleDateFormat sdf=new SimpleDateFormat("yyyy-MM-dd");
                String today=sdf.format(new Date());
@@ -104,8 +131,9 @@
       %>
       <tr>
         <td colspan="5" class="text-center">
-          <a href="#">이전</a>&nbsp;
+          <a href="list.jsp?page=<%=curpage>1?curpage-1:curpage %>">이전</a>&nbsp;
           <%=curpage %> page / <%=totalpage %> pages&nbsp;
+          <a href="list.jsp?page=<%=curpage>totalpage?totalpage:curpage %>">다음</a>&nbsp;
         </td>
       </tr>
     </table>
