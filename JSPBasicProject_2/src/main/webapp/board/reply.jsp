@@ -26,7 +26,7 @@ a:hover {
 </head>
 <body>
   <center>
-    <img id="main" src="https://i0.wp.com/aikidonews.co.kr/wp-content/uploads/2017/03/QA-e1488530256249.jpg?resize=500%2C269" width="500" height="100">
+    <img id="main" src="https://cdn-icons-png.flaticon.com/512/6311/6311574.png" width="200" height="200">
     <form method=post action="reply_ok.jsp">
     <table class="table_content" width=800>
       <tr>

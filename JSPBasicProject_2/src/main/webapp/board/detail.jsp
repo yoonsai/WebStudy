@@ -64,7 +64,7 @@ $(function(){
 </head>
 <body>
   <center>
-    <img id="main" src="https://cdn-icons-png.flaticon.com/512/6311/6311574.png" width="500" height="100">
+    <img id="main" src="https://cdn-icons-png.flaticon.com/512/6311/6311574.png" width="200" height="200">
     <table class="table_content" width=800>
       <tr>
         <th width=20%>번호</th>
