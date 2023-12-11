@@ -11,8 +11,7 @@
 <body id="top">
 <!-- header -->
 <jsp:include page="header.jsp"></jsp:include>
-
-<!--  home -->
+<!-- home -->
 <jsp:include page="home.jsp"></jsp:include>
 <jsp:include page="footer.jsp"></jsp:include>
 <a id="backtotop" href="#top"><i class="fa fa-chevron-up"></i></a> 
