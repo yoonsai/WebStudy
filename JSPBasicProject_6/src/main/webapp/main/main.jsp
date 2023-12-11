@@ -1,5 +1,14 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
-    pageEncoding="UTF-8"%>
+    pageEncoding="UTF-8" import="com.sist.change.*"%>
+<%
+request.setCharacterEncoding("UTF-8");
+   String mode=request.getParameter("mode");
+   if(mode==null)
+      mode="1";
+   int no=Integer.parseInt(mode);
+   String jsp=JspChange.change(no);
+
+%>
 <!DOCTYPE html>
 <html>
 <head>
@@ -12,7 +21,7 @@
 <!-- header -->
 <jsp:include page="header.jsp"></jsp:include>
 <!-- home -->
-<jsp:include page="home.jsp"></jsp:include>
+<jsp:include page="<%=jsp %>"></jsp:include>
 <jsp:include page="footer.jsp"></jsp:include>
 <a id="backtotop" href="#top"><i class="fa fa-chevron-up"></i></a> 
 <!-- JAVASCRIPTS --> 

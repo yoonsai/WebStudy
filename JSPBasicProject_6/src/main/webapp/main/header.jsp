@@ -99,7 +99,7 @@
       
       <li><a class="drop" href="#">맛집</a>
         <ul>
-          <li><a href="pages/gallery.html">지역별 맛집 검색</a></li>
+          <li><a href="../main/main.jsp?mode=2">지역별 맛집 검색</a></li>
           <li><a href="pages/full-width.html">맛집 예약</a></li>
           <li><a href="pages/full-width.html">맛집 추천</a></li>
         </ul>
