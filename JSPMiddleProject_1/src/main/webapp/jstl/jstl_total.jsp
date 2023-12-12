@@ -16,6 +16,11 @@
           <c:choose>
           <c:set>
           <c:out>
+          
+          <fmt:formatDate> 
+          <fmt:formatNumber>
+           
+          ${fn:String메소드} => 자바에 제어 
  --%>
 <!DOCTYPE html>
 <html>
