@@ -1,11 +1,6 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8" import="com.sist.model.*"%>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>
-<jsp:useBean id="model" class="com.sist.model.GoodsModel"/>
-
-<%
-    model.goodsAllData(request);
-%>
 <%--
   <c:set var="vo" value="${vo}"/>
 <c:set var="startPage" value="${startPage}"/>
@@ -56,10 +51,10 @@
 			<li><a href="goods.jsp?page=${startPage-1}">&lt;</a></li>
 			</c:if>
 			<c:forEach var="i" begin="${startPage}" end="${endPage}">
-			<li ${curpage==i?"class=active":"" }><a href="goods.jsp?page=${i }">${i }</a></li>
+			<li ${curpage==i?"class=active":"" }><a href="list.do?page=${i }">${i }</a></li>
 			</c:forEach>
 			<c:if test="${endPage<totalPage}">
-			<li><a href="goods.jsp?page=${endPage+1}">&gt;</a></li>
+			<li><a href="list.do?page=${endPage+1}">&gt;</a></li>
 			</c:if>
 		</ul>
 	</div>

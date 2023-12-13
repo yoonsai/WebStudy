@@ -1,11 +1,17 @@
 package com.sist.model;
-import com.sist.dao.*;
-import com.sist.vo.*;
-import java.util.*;
+
+import java.util.List;
+
 import javax.servlet.http.HttpServletRequest;
-public class GoodsModel {
-	public void goodsAllData(HttpServletRequest request)
-	{
+
+import com.sist.dao.GoodsDAO;
+import com.sist.vo.GoodsVO;
+
+public class ListModel implements Model {
+
+	@Override
+	public String handleRequest(HttpServletRequest request) {
+		// TODO Auto-generated method stub
 		final int BLOCK=10;
 		String page=request.getParameter("page");
 		if(page==null)
@@ -31,5 +37,8 @@ public class GoodsModel {
 		request.setAttribute("endPage", endPage);
 		request.setAttribute("totalPage", totalPage);
 		request.setAttribute("list", list);
+		
+		return "goods/list.jsp";
 	}
+
 }
