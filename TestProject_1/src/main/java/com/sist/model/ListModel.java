@@ -23,7 +23,7 @@ public class ListModel implements Model {
 		int endPage=((curpage-1)/BLOCK*BLOCK)+BLOCK;
 		
 
-		GoodsDAO dao=new GoodsDAO();
+		GoodsDAO dao=GoodsDAO.newInstance();
         List<GoodsVO> list=dao.goodsListData(curpage);
 		int totalPage=dao.totalPage();
 		

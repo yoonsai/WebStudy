@@ -59,7 +59,7 @@ public class Controller extends HttpServlet {
 		cmd=cmd.substring(request.getContextPath().length()+1,cmd.lastIndexOf("."));
 		Model model=(Model)clsMap.get(cmd);
 		//Model model=(Model)clsMap.get(cmd);
-		String jsp=model.handleRequest(request);
+		String jsp=model.handleRequest(request); //goods/list.jsp
 		if(jsp.startsWith("redirect:"))
 		{
 			jsp=jsp.substring(jsp.indexOf(":")+1);
@@ -68,6 +68,7 @@ public class Controller extends HttpServlet {
 		else {
 			RequestDispatcher rd=request.getRequestDispatcher(jsp);
 			rd.forward(request, response);
+			
 		}
 	}
 

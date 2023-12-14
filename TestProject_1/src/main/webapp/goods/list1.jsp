@@ -28,7 +28,7 @@
 		<c:forEach var="vo" items="${list}">
 			<div class="col-md-3">
 				<div class="thumbnail">
-					<a href="detail.do?no=${vo.gno }"> <img src="${vo.getPoster()}"
+					<a href="#"> <img src="${vo.getPoster()}"
 						title="${vo.gname }">
 						<div class="caption">
 							<p>${vo.price }</p>

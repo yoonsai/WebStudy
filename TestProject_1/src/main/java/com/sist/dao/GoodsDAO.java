@@ -7,8 +7,15 @@ public class GoodsDAO {
 	private Connection conn;
 	private PreparedStatement ps;
 	private CreateDBCPConnection dbconn=new CreateDBCPConnection();
-	private GoodsDAO dao;
+	private static GoodsDAO dao;
 	private final int ROWSIZE=12;
+	
+	public static GoodsDAO newInstance() {
+        if (dao == null)
+            dao = new GoodsDAO();
+        return dao;
+    }
+	
 	
 	public List<GoodsVO> goodsListData(int page)
 	{
@@ -63,6 +70,34 @@ public class GoodsDAO {
 			dbconn.disConnection(conn, ps);
 		}
 		return total;
-		
 	}
+	public GoodsVO goodsDetailData(int gno)
+	  {
+		  GoodsVO vo=new GoodsVO();
+		  try
+		  {
+			  conn=dbconn.getConnection();
+			  String sql="SELECT * FROM goods"
+					    +" WHERE gno="+gno;
+			  ps=conn.prepareStatement(sql);
+			  ResultSet rs=ps.executeQuery();
+			  rs.next();
+			  vo.setGno(rs.getInt(1));
+			  vo.setGname(rs.getString(2));
+			  vo.setPoster(rs.getString(3));
+			  vo.setOrigin(rs.getString(4));
+			  vo.setManufacturer(rs.getString(5));
+			  vo.setPrice(rs.getString(6));
+			  vo.setDimage(rs.getString(7));
+			  rs.close();
+		  }catch(Exception ex)
+		  {
+			  ex.printStackTrace();
+		  }
+		  finally
+		  {
+			  dbconn.disConnection(conn, ps);
+		  }
+		  return vo;
+	  }
 }

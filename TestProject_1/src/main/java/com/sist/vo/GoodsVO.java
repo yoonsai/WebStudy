@@ -12,7 +12,7 @@ package com.sist.vo;
  */
 public class GoodsVO {
     private int gno;
-    private String gname,poster,origin,manufacturer,price,deimage;
+    private String gname,poster,origin,manufacturer,price,dimage;
    public int getGno() {
       return gno;
    }
@@ -49,11 +49,11 @@ public class GoodsVO {
    public void setPrice(String price) {
       this.price = price;
    }
-   public String getDeimage() {
-      return deimage;
+   public String getDimage() {
+      return dimage;
    }
-   public void setDeimage(String deimage) {
-      this.deimage = deimage;
+   public void setDimage(String dimage) {
+      this.dimage = dimage;
    }
    
 }
