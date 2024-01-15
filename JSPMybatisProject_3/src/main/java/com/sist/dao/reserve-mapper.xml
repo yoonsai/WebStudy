@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.dao.reserve-mapper">
+  <!--  맛집 목록 출력  -->
+  <select id="reserveFoodListData" resultType="FoodVO" parameterType="hashmap">
+    SELECT fno,poster,name 
+    FROM food_menu_house
+    <if test="no==1">
+     WHERE type LIKE '%한식%'
+    </if>
+    <if test="no==2">
+     WHERE type LIKE '%양식%'
+    </if>
+    <if test="no==3">
+     WHERE type LIKE '%중식%'
+    </if>
+    <if test="no==4">
+     WHERE type LIKE '%일식%'
+    </if>
+  </select>
+  <select id="reserveDays" resultType="String" parameterType="int">
+    SELECT rday FROM food_menu_house
+    WHERE fno=#{fno}
+  </select>
+  <select id="reserveTimes" resultType="String" parameterType="int">
+    SELECT rtime FROM reserve_day
+    WHERE rno=#{rno}
+  </select>
+  <select id="reserveGetTime" resultType="String" parameterType="int">
+    SELECT time FROM reserve_time
+    WHERE tno=#{tno}
+  </select>
+  <!-- 예약정보 저장 -->
+  <select id="reserveInsertData" parameterType="ReserveInfoVO">
+    INSERT INTO reserve(no,fno,id,time,day,inwon) 
+    VALUES((SELECT NVL(MAX(no)+1,1) FROM reserve),#{fno},#{id},#{time},#{day},#{inwon})
+  </select>
+  <!-- 마이페이지 예약정보읽기-->
+  <resultMap type="com.sist.vo.ReserveInfoVO" id="myMap">
+     <result property="fvo.poster" column="poster"/>
+     <result property="fvo.name" column="name"/>
+     <result property="fvo.address" column="address"/>
+     <result property="fvo.phone" column="phone"/>
+  </resultMap>
+  <select id="reserveMyPageListData" resultMap="myMap" parameterType="String">
+     SELECT no,r.fno,poster,name,address,phone,r.day,r.time,r.inwon,ok,regdate
+     FROM reserve r, food_menu_house f
+     WHERE r.fno=f.fno
+     AND id=#{id}
+     ORDER BY no DESC
+  </select>
+  <select id="reserveAdminPageListData" resultMap="myMap">
+     SELECT no,r.fno,poster,name,address,phone,r.day,r.time,r.inwon,id,ok
+     FROM reserve r, food_menu_house f
+     WHERE r.fno=f.fno
+     ORDER BY no DESC
+  </select>
+  <update id="reserveAdminOk" parameterType="int">
+     UPDATE reserve SET ok=1
+     WHERE no=#{no}
+  </update>
+</mapper>

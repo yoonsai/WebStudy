@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.dao.seoul-mapper">
+  <sql id="select">
+     SELECT no,poster,title,num
+     FROM (SELECT no,poster,title,rownum as num 
+     FROM (SELECT no,poster,title FROM 
+  </sql>
+  <sql id="where">
+     ORDER BY no))
+     WHERE num BETWEEN #{start} AND #{end}
+  </sql>
+  <sql id="total">
+     SELECT CEIL(COUNT(*)/20.0)
+  </sql>
+  <select id="seoulLocationListData" resultType="SeoulVO" parameterType="Hashmap">
+     <include refid="select"/> seoul_location 
+     <include refid="where"/>
+  </select>
+  
+  <select id="seoulNatureListData" resultType="SeoulVO" parameterType="Hashmap">
+     <include refid="select"/> seoul_nature 
+     <include refid="where"/>
+  </select>
+  
+  <select id="seoulShopListData" resultType="SeoulVO" parameterType="Hashmap">
+     <include refid="select"/> seoul_shop
+     <include refid="where"/>
+  </select>
+  
+   <select id="seoulLocationTotalPage" resultType="int">
+     <include refid="total"/> FROM seoul_location
+  </select>
+   <select id="seoulNatureTotalPage" resultType="int">
+     <include refid="total"/> FROM seoul_nature
+  </select>
+   <select id="seoulShopTotalPage" resultType="int">
+     <include refid="total"/> FROM seoul_shop
+  </select>
+  <!-- 상세보기 : hit증가 -->
+   <update id="seoulLocationHitIncrement" parameterType="int">
+     UPDATE seoul_location SET hit=hit+1
+     WHERE no=#{no}
+  </update>
+ <select id="seoulLocationDetailData" resultType="SeoulVO" parameterType="int">
+    SELECT * FROM seoul_location
+    WHERE no = #{no}
+</select>
+
+  <!-- 인접맛집 -->
+  <select id="seoulFoodData" resultType="FoodVO" parameterType="String">
+     SELECT fno,name,poster,type,rownum
+     FROM food_menu_house
+     WHERE address LIKE '%'||#{address}||'%'
+     AND rownum&lt;=5
+  </select>
+</mapper>
