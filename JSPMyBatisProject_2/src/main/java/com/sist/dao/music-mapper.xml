@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 
+     4. ?에 값을 채우는 경우
+        #{}, ${} => ''없다(테이블명, 컬럼명)
+                    "FROM ${tab}
+        === 문자열''
+        === {} ==> map => map.get(id) #{name} => map.get("name")
+                   vo => vo.getXxx() #{name} => vo.getName()
+     5. 추가
+        <insert> => resultType속성이 없다
+        => 자동 증가번호
+           <selectKey>,서브쿼리,시퀀스
+     6. <update>,<delete>
+     7. 복잡한 긴 SQL문장이 여러번 반복할 경우
+        <sql> => <include>
+ -->
+<mapper namespace="com.sist.dao.music-mapper">
+   <select id="musicFindData" resultType="MusicVO" parameterType="hashmap">
+     SELECT no,title,singer,poster,state,album,idcrement
+     FROM genie_music
+     WHERE
+     <trim prefixOverrides="OR"> <!-- prefix="OR" 값마다 앞에 OR를 첨부 , 만약에 맨앞에 OR가 있으면 prefixOverrides 맨앞에 있는 OR를 지워라 -->
+     <!-- 
+         for(String fs:fsArr)
+         
+      -->
+      <foreach collection="fsArr" item="fs">
+       <trim prefix="OR">
+        <choose>
+       <when test="fs=='T'.toString()">
+         title LIKE '%'||#{ss}||'%'
+       </when>
+       <when test="fs=='S'.toString()">
+         singer LIKE '%'||#{ss}||'%'
+       </when>
+       <when test="fs=='A'.toString()">
+         album LIKE '%'||#{ss}||'%'
+       </when>
+     </choose>
+     </trim>
+     </foreach>
+     </trim>
+   </select>
+</mapper>
