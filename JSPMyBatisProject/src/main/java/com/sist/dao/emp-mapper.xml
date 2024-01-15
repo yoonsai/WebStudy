@@ -1,0 +1,157 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.sist.dao.emp-mapper">
+<!-- 
+    SQL문장 저장
+    1. 데이터를 받을 데이터형 설정 : resultType
+    2. ?에 들어가는 값 설정 : parameterType
+    3. VO에 값을 요청시에는 column명이 다른 경우에는 설정
+       vo의 변수 = column이 같은 경우
+       class EmpVO
+       {
+           private int empno; ==>  empno => setEmpno()
+           private String name; =X=> (못찾음) ename => setEname()
+                            |
+                            | alias해줘야함
+           select Empno,ename as name
+                  setEmpno() setEname()
+       }
+    4. ? 대신 사용 => index
+       #{변수명}, ${테이블명/컬럼명}
+       => ''
+       String name="홍길동"
+       WHERE name=${name}
+       => WHERE name=홍길동 (''가 없어서 오류남) => WHERE name=#{name}으로 해야됨
+       
+       String table="emp"
+       FROM #{table} => FROM 'emp'
+       ============================= 기초
+    5. 동적 쿼리
+       이름
+       제목
+       내용
+       
+       이름+제목
+       이름+내용
+       
+       제목+내용
+       
+       이름 + 제목 + 내용
+    6. 프로시저 호출
+    ================================= XML / Annotation
+           XML + Annotation => Spring-Boot
+     <select>
+       SELECT ~
+     </select>
+     @Select("SELECT ~")
+     
+     
+     주의점 : 태그 한개의 SQL문장만 지정할 수 있다
+            여러개 있는 경우에는 서브쿼리를 이용한다
+     => <select> : 데이터 검색
+        <insert> : 데이터 추가
+        <update> : 데이터 수정
+        <delete> : 데이터 삭제
+        <selectKey> : 자동증가번호
+        <resultMap> : JOIN
+        
+        class EmpVO
+        {
+           private int empno;
+           private String ename;
+           private DeptVO dvo=new DeptVO();
+        }
+        
+        class DeptVO
+        {
+           private String dname;
+           private String loc;
+        }
+        
+        SELECT empno,ename,dname,loc
+        FROM emp,dept
+        WHERE emp.deptno=dept.deptno
+        
+        <resultMap type="com.sist.dao.EmpVO">
+          <result property="empno" column="empno"/>
+           => vo.setEmpno(rs.getInt("empno"))
+           <result property="empno" column="empno"/>
+           => vo.setEname(rs.getInt("ename"))
+           <result property="dvo.dname" column="dname"/>
+           => vo.setDname(rs.getInt("dname"))
+        </resultMap>
+        While(rs.next())
+        {
+           EmpVO vo=new EmpVO();
+           vo.setEmpno(rs.getInt(2));
+           vo.setEname(rs.getString(2));
+           vo.getDvo.setDname(rs.getString(3));
+           vo.getDvo.setLoc(rs.getString(4));
+        }
+        <parameterMap> : 프로시저
+     => <if>
+        <foreach> IN연산자 IN()
+        <choose> 다중 조건문
+        <where> 조건문
+        <trim> 제거
+        
+        WHERE
+       <trim prefixOverride="OR"> => OR가 제일 앞에 있으면 지워라
+        <if test="col=='name'">
+        name LIKE ..
+        </if>
+        <if test="col=='subject'">
+        OR subject LIKE ..
+        </if>
+        <if test="col=='content'">
+        OR content LIKE ..
+        </if>
+        </trim>
+ -->
+  <!-- as => 1.함수, 2.컬럼명이 다른경우 -->
+  <select id="empListData" resultType="EmpVO">
+     SELECT empno,ename,job,mgr,TO_CHAR(hiredate,'YYYY-MM-DD') as dbday,sal,comm,deptno FROM emp
+  </select>
+  
+   <resultMap type="com.sist.dao.EmpVO" id="empMap">
+        <result property="dvo.dname" column="dname"/>
+        <result property="dvo.loc" column="loc"/>
+    </resultMap>
+  <sql id="select">
+     SELECT empno,ename,job,mgr,TO_CHAR(hiredate,'YYYY-MM-DD') as dbday,sal,
+  </sql>
+  <select id="empDeptJoinData" resultMap="empMap">
+     SELECT empno,ename,job,TO_CHAR(hiredate,'YYYY-MM-DD') as dbday,
+     sal,dname,loc
+     FROM emp JOIN dept
+     ON emp.deptno=dept.deptno
+  </select>
+  
+  <select id="empsubqueryData" resultMap="empMap">
+     SELECT empno,ename,job,TO_CHAR(hiredate,'YYYY-MM-DD') as dbday,sal,
+     (SELECT dname FROM dept WHERE deptno=emp.deptno) as dname,
+     (SELECT loc FROM dept WHERE deptno=emp.deptno) as loc
+     FROM emp
+  </select>
+  <select id="empData" resultType="EmpVO">
+     SELECT * FROM emp
+     WHERE sal&lt;3000 <!-- 비교연산자는 &lt;()나 &gt;()로 해야됨 -->  
+  </select>
+  <!-- 
+      List<String> List<int>
+      int => java.lang.Integer
+      String은 java.lang.생략가능 
+   -->
+  <select id="empNameData" resultType="java.lang.String">
+     SELECT ename FROM emp
+  </select>
+  <select id="empFindData" parameterType="hashMap">
+     SELECT empno,ename,job,TO_CHAR(hiredate,'YYYY-MM-DD') as dbday,sal FROM emp 
+     <!-- WHERE ename IN
+     <foreach collection="names" item="name" open="()" close=")" separator=",">${name}</foreach> -->
+     
+     <trim prefix="WHERE ename IN(" suffix=")" suffixOverrides=")"> <!-- suffix 추가 suffixOverrides삭제  suffix=")" suffixOverrides=")" 지워도 똑같음-->
+       <foreach collection="names" item="name" close=")" separator=",">${name}</foreach>
+     </trim>
+  </select>
+</mapper>
